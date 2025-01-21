@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .email-container {
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            border-top: 4px solid #4caf50;
+        }
+
+        h2 {
+            color: #333;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+
+        p {
+            color: #555;
+            font-size: 16px;
+            line-height: 1.7;
+            margin-bottom: 20px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            background-color: #4caf50;
+            color: #fff;
+            font-size: 18px;
+            padding: 15px 35px;
+            text-decoration: none;
+            border-radius: 8px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .cta-button:hover {
+            background-color: #388e3c;
+        }
+
+        .footer {
+            color: #777;
+            font-size: 14px;
+            margin-top: 30px;
+        }
+
+        @media (max-width: 600px) {
+            .email-container {
+                padding: 20px;
+                width: 90%;
+            }
+
+            h2 {
+                font-size: 22px;
+            }
+
+            p {
+                font-size: 15px;
+            }
+
+            .cta-button {
+                font-size: 16px;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <h2>Welcome to Baskit!</h2>
+        <p>Thank you for signing up with us.</p>
+        <p>To complete your registration, please click the button below to verify your email address:</p>
+        <a href="{{verification_link}}" class="cta-button">Verify Your Email</a>
+        <p class="footer">If you did not create an account with Baskit, please ignore this email.</p>
+    </div>
+</body>
+</html>
