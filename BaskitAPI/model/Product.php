@@ -33,24 +33,79 @@ class Product
         $result = $conn->query($sql);
         return $result->fetch_all(MYSQLI_ASSOC);
     }
-
-        // Fetch all products
-        public static function fetchAll($conn)
-        {
-            $sql = "SELECT * FROM products";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
-        }
     
-        // Fetch products by category
-        public static function fetchByCategory($conn, $category)
-        {
-            $sql = "SELECT * FROM products WHERE product_category = ?";
-            $stmt = $conn->prepare($sql);
-            $stmt->bind_param("s", $category);
-            $stmt->execute();
-            $result = $stmt->get_result();
-            return $result->fetch_all(MYSQLI_ASSOC);
+    public static function getProductById($id, $conn) {
+        $sql = "SELECT p.*, s.store_name, s.store_phone_number 
+                FROM products p 
+                JOIN stores s ON p.store_id = s.id
+                WHERE p.id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        
+        $product = $result->fetch_assoc();
+        
+        if ($product) {
+            return $product;
+        } else {
+            return ['error' => 'Product not found'];
         }
+    }
+    
+    //--------- CATEGORY ---------// (FETCHING ALL PRODUCTS FROM EACH CATEGORY IN ALL STORES )
+    public static function fetchByCategoryFruit($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FRUITS'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryVegetable($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'VEGETABLES'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryMeat($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'MEAT'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryFish($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FISH'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryFrozen($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FROZEN'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategorySpice($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'SPICES'";
+        $stmt = $conn->prepare($sql);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
 }
 ?>

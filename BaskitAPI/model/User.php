@@ -75,7 +75,7 @@ class User
     {
         $sql = "INSERT INTO access_tokens (user_id, access_token) VALUES (?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("iss", $userId, $token);
+        $stmt->bind_param("is", $userId, $token);
         return $stmt->execute();
     }
 

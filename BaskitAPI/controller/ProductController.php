@@ -22,7 +22,7 @@ class ProductController
         $rating = $data['product_rating'];
         $storeId = $data['store_id'];
     
-        $validCategories = ['STORE', 'VEGETABLES', 'MEAT', 'FISH', 'FROZEN', 'SPICES', 'FRUITS'];
+        $validCategories = ['STORE', 'FRUITS', 'VEGETABLES', 'MEAT', 'FISH', 'FROZEN', 'SPICES'];
         $validOrigins = ['DAGUPAN', 'CALASIAO'];
     
         if (!in_array($category, $validCategories)) {
@@ -45,17 +45,35 @@ class ProductController
         return ['error' => 'Failed to create product'];
     }
 
-    public static function list($conn)
-    {
+    public static function list($conn){
         return Product::getProducts($conn);
     }
 
-    public static function getAllProducts($conn) {
-        return Product::fetchAll($conn);
+    public static function getSpecificProductByid($id, $conn){
+        return Product::getProductById($id, $conn);
     }
 
-    public static function getProductsByCategory($conn, $category) {
-        return Product::fetchByCategory($conn, $category);
+    public static function getProductsByCategoryFruit($conn) {
+        return Product::fetchByCategoryFruit($conn);
+    }
+    public static function getProductsByCategoryVegetable($conn) {
+        return Product::fetchByCategoryVegetable($conn);
+    }
+
+    public static function getProductsByCategoryMeat($conn) {
+        return Product::fetchByCategoryMeat($conn);
+    }
+
+    public static function getProductsByCategoryFish($conn) {
+        return Product::fetchByCategoryFish($conn);
+    }
+
+    public static function getProductsByCategoryFrozen($conn) {
+        return Product::fetchByCategoryFrozen($conn);
+    }
+
+    public static function getProductsByCategorySpice($conn) {
+        return Product::fetchByCategorySpice($conn);
     }
 
 }

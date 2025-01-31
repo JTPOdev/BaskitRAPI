@@ -2,11 +2,13 @@
 require_once __DIR__ . '/../controller/UserController.php';
 require_once __DIR__ . '/../controller/StoreController.php';
 require_once __DIR__ . '/../controller/ProductController.php';
+require_once __DIR__ . '/../controller/CartController.php';
 require_once __DIR__ . '/../controller/AdminController.php';
 require_once __DIR__ . '/../model/User.php';
 require_once __DIR__ . '/../model/Admin.php';
 require_once __DIR__ . '/../model/Store.php';
 require_once __DIR__ . '/../model/Product.php';
+require_once __DIR__ . '/../model/Cart.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
@@ -47,23 +49,41 @@ class Router
         $this->addRoute('GET', $path, $callback, $authRequired);
     }
 
+    // PUT route
+    public function put($path, $callback, $authRequired = false)
+    {
+        $this->addRoute('PUT', $path, $callback, $authRequired);
+    }
+
+    // DELETE route
+    public function delete($path, $callback, $authRequired = false)
+    {
+        $this->addRoute('DELETE', $path, $callback, $authRequired);
+    }
+
     public function setNotFound($callback)
     {
         $this->notFound = $callback;  
     }
 
-    // Dispatch the request to the correct route handler
     public function dispatch()
     {
         $method = $_SERVER['REQUEST_METHOD'];
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         foreach ($this->routes as $route) {
-            if ($route['method'] === $method && $route['path'] === $uri) {
+            $pattern = preg_replace('/\{[a-zA-Z0-9_]+\}/', '([a-zA-Z0-9_]+)', $route['path']);
+            $pattern = "#^$pattern$#";
+
+            if ($route['method'] === $method && preg_match($pattern, $uri, $matches)) {
+                $params = array_slice($matches, 1); // Extract dynamic params
+
                 if ($route['authRequired']) {
                     AuthMiddleware::checkAuth();
                 }
-                call_user_func($route['callback']);
+
+                // Call the callback function, passing extracted params
+                call_user_func_array($route['callback'], $params);  
                 return;
             }
         }
@@ -73,6 +93,7 @@ class Router
             call_user_func($this->notFound);
         }
     }
+
 }
 
 $router = new Router();
@@ -143,14 +164,54 @@ $router->get('/api/auth/product/list', function () use ($conn) {
     echo json_encode(ProductController::list($conn));
 }, true);
 
-$router->get('/api/auth/product', function() use ($conn) {
-    echo json_encode(ProductController::getAllProducts($conn));
+$router->get('/api/auth/product/specific/{id}', function ($id) use ($conn) {
+    echo json_encode(ProductController::getSpecificProductByid($id, $conn));
+}, true);
+
+//---------- CETEGORY ----------//
+$router->get('/api/auth/product/category/fruit', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategoryFruit($conn));
 });
 
-$router->get('/api/auth/product/category/{product_category}', function() use ($conn) {
-    $category = $_GET['product_category'] ?? '';
-    echo json_encode(ProductController::getProductsByCategory($conn, $category));
+$router->get('/api/auth/product/category/vegetable', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategoryVegetable($conn));
 });
+
+$router->get('/api/auth/product/category/meat', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategoryMeat($conn));
+});
+
+$router->get('/api/auth/product/category/fish', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategoryFish($conn));
+});
+
+$router->get('/api/auth/product/category/frozen', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategoryFrozen($conn));
+});
+
+$router->get('/api/auth/product/category/spice', function() use ($conn) {
+    echo json_encode(ProductController::getProductsByCategorySpice($conn));
+});
+
+//---------- CART ----------//
+$router->post('/api/auth/cart/add', function() use ($conn) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    echo json_encode(CartController::addToCart($data, $conn));
+}, true);
+
+$router->get('/api/auth/cart/view/{user_id}', function($user_id) use ($conn) {
+    echo json_encode(CartController::viewCart($user_id, $conn));
+}, true);
+
+$router->put('/api/auth/cart/update', function() use ($conn) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    echo json_encode(CartController::updateCart($data, $conn));
+}, true);
+
+$router->delete('/api/auth/cart/remove', function() use ($conn) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    echo json_encode(CartController::removeFromCart($data, $conn));
+}, true);
 
 $router->setNotFound(function() {
     echo json_encode(['error' => 'Route not found']);
