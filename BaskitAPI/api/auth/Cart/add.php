@@ -4,4 +4,4 @@ require_once '../../../controller/CartController.php';
 
 $accessToken = AuthMiddleware::checkAuth();
 $data = json_decode(file_get_contents("php://input"), true);
-echo json_encode(CartController::addToCart($data, $conn));
+echo json_encode(CartController::addToCart($accessToken, $data, $conn));

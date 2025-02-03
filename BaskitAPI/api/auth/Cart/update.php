@@ -12,5 +12,5 @@ if (!isset($data['id']) || !isset($data['product_quantity'])) {
     exit;
 }
 
-$response = CartController::updateCart($data, $conn);
+$response = CartController::updateCart($accessToken, $data, $conn);
 echo json_encode($response);

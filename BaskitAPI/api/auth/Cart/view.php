@@ -11,5 +11,5 @@ if (!isset($_GET['user_id'])) {
 }
 
 $userId = intval($_GET['user_id']);
-$response = CartController::viewCart($userId, $conn);
+$response = CartController::viewCart($accessToken, $conn);
 echo json_encode($response);

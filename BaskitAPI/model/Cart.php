@@ -44,15 +44,24 @@ class Cart
 
     public static function getUserCart($userId, $conn)
     {
-        $sql = "SELECT * FROM cart WHERE user_id = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("i", $userId);
-        $stmt->execute();
-        return $stmt->get_result()->fetch_all(MYSQLI_ASSOC);
+        $query = "SELECT * FROM cart WHERE user_id = ?";
+        
+        if ($stmt = $conn->prepare($query)) {
+            $stmt->bind_param("i", $userId);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            $cartItems = $result->fetch_all(MYSQLI_ASSOC);
+            $stmt->close();
+            
+            return $cartItems;
+        } else {
+            return ['error' => 'Failed to prepare statement.'];
+        }
     }
 
     public static function updateCart($userId, $productId, $quantity, $portion, $conn)
     {
+        AuthMiddleware::checkAuth();
         $sql = "UPDATE cart SET product_quantity = ? WHERE user_id = ? AND product_id = ? AND product_portion = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iiis", $quantity, $userId, $productId, $portion);
@@ -61,6 +70,7 @@ class Cart
 
     public static function removeFromCart($userId, $productId, $portion, $conn)
     {
+        AuthMiddleware::checkAuth();
         $sql = "DELETE FROM cart WHERE user_id = ? AND product_id = ? AND product_portion = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iis", $userId, $productId, $portion);

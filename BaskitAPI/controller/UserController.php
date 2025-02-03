@@ -185,20 +185,21 @@ class UserController
     }
 
     public static function logout($data, $conn)
-    {
-        // Get the user_id from the access token by checking the auth
-        $userId = AuthMiddleware::checkAuth($conn);
-    
-        // Proceed to delete the access token for the current user
-        $stmt = $conn->prepare("DELETE FROM access_tokens WHERE user_id = ?");
-        $stmt->bind_param("i", $userId); // Use 'i' for integer (user_id)
-        $stmt->execute();
-    
-        if ($stmt->affected_rows > 0) {
-            return ['success' => 'Logged out successfully.'];
-        } else {
-            return ['error' => 'Logout failed. Please try again later.'];
-        }
+{
+    $accessToken = AuthMiddleware::checkAuth();
+
+    if (!$accessToken) {
+        return ['error' => 'No access token provided.'];
     }
-    
+
+    $userId = User::getUserIdByAccessToken($conn, $accessToken);
+    if (!$userId) {
+        return ['error' => 'Invalid or expired access token.'];
+    }
+
+    if (!User::deleteAccessToken($conn, $userId, $accessToken)) {
+        return ['error' => 'Logout failed. Please try again later.'];
+    }
+    return ['success' => 'Logged out successfully.'];
+}
 }

@@ -12,58 +12,47 @@ require_once __DIR__ . '/../model/Cart.php';
 require_once __DIR__ . '/../config/database.php';
 require_once __DIR__ . '/../middleware/AuthMiddleware.php';
 
-// New instance of the database connection
-$conn = new mysqli($host, $username, $password, $dbname);
+$conn = Database::getConnection();
 
-// Check if the connection was successful
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
-
-// Router class to manage routes
 class Router
 {
     private $routes = [];
     private $notFound;
 
-    // Add a route
-    public function addRoute($method, $path, $callback, $authRequired = false)
+    public function addRoute($method, $path, $callback, $authRequired = false, $isAdminRoute = false)
     {
         $this->routes[] = [
-            'method' => $method, 
-            'path' => $path, 
-            'callback' => $callback, 
-            'authRequired' => $authRequired
+            'method' => $method,
+            'path' => $path,
+            'callback' => $callback,
+            'authRequired' => $authRequired,
+            'isAdminRoute' => $isAdminRoute
         ];
     }
 
-    // POST route
-    public function post($path, $callback, $authRequired = false)
+    public function post($path, $callback, $authRequired = false, $isAdminRoute = false)
     {
-        $this->addRoute('POST', $path, $callback, $authRequired);
+        $this->addRoute('POST', $path, $callback, $authRequired, $isAdminRoute);
     }
 
-    // GET route
-    public function get($path, $callback, $authRequired = false)
+    public function get($path, $callback, $authRequired = false, $isAdminRoute = false)
     {
-        $this->addRoute('GET', $path, $callback, $authRequired);
+        $this->addRoute('GET', $path, $callback, $authRequired, $isAdminRoute);
     }
 
-    // PUT route
-    public function put($path, $callback, $authRequired = false)
+    public function put($path, $callback, $authRequired = false, $isAdminRoute = false)
     {
-        $this->addRoute('PUT', $path, $callback, $authRequired);
+        $this->addRoute('PUT', $path, $callback, $authRequired, $isAdminRoute);
     }
 
-    // DELETE route
-    public function delete($path, $callback, $authRequired = false)
+    public function delete($path, $callback, $authRequired = false, $isAdminRoute = false)
     {
-        $this->addRoute('DELETE', $path, $callback, $authRequired);
+        $this->addRoute('DELETE', $path, $callback, $authRequired, $isAdminRoute);
     }
 
     public function setNotFound($callback)
     {
-        $this->notFound = $callback;  
+        $this->notFound = $callback;
     }
 
     public function dispatch()
@@ -72,18 +61,17 @@ class Router
         $uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
         foreach ($this->routes as $route) {
-            $pattern = preg_replace('/\{[a-zA-Z0-9_]+\}/', '([a-zA-Z0-9_]+)', $route['path']);
+            $pattern = preg_replace('/\{[a-zA-Z0-9_]+\}/', '([a-zA-Z0-9_-]+)', $route['path']);
             $pattern = "#^$pattern$#";
 
             if ($route['method'] === $method && preg_match($pattern, $uri, $matches)) {
-                $params = array_slice($matches, 1); // Extract dynamic params
+                $params = array_slice($matches, 1);
 
                 if ($route['authRequired']) {
-                    AuthMiddleware::checkAuth();
+                    AuthMiddleware::checkAuth($route['isAdminRoute']);
                 }
 
-                // Call the callback function, passing extracted params
-                call_user_func_array($route['callback'], $params);  
+                call_user_func_array($route['callback'], $params);
                 return;
             }
         }
@@ -93,126 +81,111 @@ class Router
             call_user_func($this->notFound);
         }
     }
-
 }
 
 $router = new Router();
 
 
-//---------- AUTHENTICATION ----------//
+// ---------- AUTHENTICATION ---------- //
 $router->post('/api/auth/register', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
-    $response = UserController::register($data, $conn);
-    echo json_encode($response);
+    echo json_encode(UserController::register($data, $conn));
 });
 
 $router->get('/api/auth/verify_email', function() use ($conn) {
-    if (isset($_GET['token'])) {
-        $verification_token = $_GET['token'];
-        $response = UserController::verifyEmail($verification_token, $conn);
-        echo json_encode($response);
-    } else {
-        echo json_encode(['error' => 'Verification token missing.']);
-    }
+    $verification_token = $_GET['token'] ?? null;
+    echo json_encode($verification_token
+        ? UserController::verifyEmail($verification_token, $conn)
+        : ['error' => 'Verification token missing.']
+    );
 });
 
 $router->post('/api/auth/login', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
-    $response = UserController::login($data, $conn);
-    echo json_encode($response);
+    echo json_encode(UserController::login($data, $conn));
 });
 
 $router->post('/api/auth/logout', function() use ($conn) {
     AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
-    $response = UserController::logout($data, $conn);
-    echo json_encode($response);
-});
+    echo json_encode(UserController::logout($data, $conn));
+},true,false);
 
-//--------- ADMIN AUTHENTICATION ---------//
+
+// ---------- ADMIN AUTH ---------- //
 $router->post('/api/auth/admin/register', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
-    $response = AdminController::register($data, $conn);
-    echo json_encode($response);
-});
+    echo json_encode(AdminController::register($data, $conn));
+}, false, true);
 
 $router->post('/api/auth/admin/login', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
-    $response = AdminController::login($data, $conn);
-    echo json_encode($response);
+    echo json_encode(AdminController::login($data, $conn));
 });
 
 
-//---------- STORE ----------//
-$router->post('/api/auth/store/create', function () use ($conn) {
+// ---------- STORE ---------- //
+$router->post('/api/auth/store/create', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(StoreController::create($data, $conn));
-}, true);
+}, true, true);
 
-$router->get('/api/auth/store/list', function () use ($conn) {
+$router->get('/api/auth/store/list', function() use ($conn) {
     echo json_encode(StoreController::list($conn));
-}, true);
+}, false);
 
 
-//---------- PRODUCT ----------//
-$router->post('/api/auth/product/create', function () use ($conn) {
+// ---------- PRODUCT ---------- //
+$router->post('/api/auth/product/create', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(ProductController::create($data, $conn));
-}, true);
-
-$router->get('/api/auth/product/list', function () use ($conn) {
+}, true, true);
+    
+$router->get('/api/auth/product/list', function() use ($conn) {
     echo json_encode(ProductController::list($conn));
 }, true);
 
-$router->get('/api/auth/product/specific/{id}', function ($id) use ($conn) {
+$router->get('/api/auth/product/specific/{id}', function($id) use ($conn) {
     echo json_encode(ProductController::getSpecificProductByid($id, $conn));
-}, true);
+}, false);
 
-//---------- CETEGORY ----------//
-$router->get('/api/auth/product/category/fruit', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategoryFruit($conn));
-});
 
-$router->get('/api/auth/product/category/vegetable', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategoryVegetable($conn));
-});
+// ---------- PRODUCT CATEGORIES ---------- //
+$categories = ['fruit', 'vegetable', 'meat', 'fish', 'frozen', 'spice'];
+foreach ($categories as $category) {
+    $router->get("/api/auth/product/category/{$category}", function() use ($conn, $category) {
+        $method = 'getProductsByCategory' . ucfirst($category);
+        echo json_encode(ProductController::$method($conn));
+    });
+}
 
-$router->get('/api/auth/product/category/meat', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategoryMeat($conn));
-});
 
-$router->get('/api/auth/product/category/fish', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategoryFish($conn));
-});
-
-$router->get('/api/auth/product/category/frozen', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategoryFrozen($conn));
-});
-
-$router->get('/api/auth/product/category/spice', function() use ($conn) {
-    echo json_encode(ProductController::getProductsByCategorySpice($conn));
-});
-
-//---------- CART ----------//
+// ---------- CART ---------- //
 $router->post('/api/auth/cart/add', function() use ($conn) {
+    $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode(CartController::addToCart($data, $conn));
-}, true);
+    echo json_encode(CartController::addToCart($authUserId, $data, $conn));
+}, false, true);
 
-$router->get('/api/auth/cart/view/{user_id}', function($user_id) use ($conn) {
-    echo json_encode(CartController::viewCart($user_id, $conn));
-}, true);
+$router->get('/api/auth/cart/view/{user_id}', function() use ($conn) {
+    $authUserId = AuthMiddleware::checkAuth();
+    echo json_encode(CartController::viewCart($authUserId,$conn));
+}, false, true);
 
 $router->put('/api/auth/cart/update', function() use ($conn) {
+    $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode(CartController::updateCart($data, $conn));
-}, true);
+    echo json_encode(CartController::updateCart($authUserId, $data, $conn));
+},false, true);
 
 $router->delete('/api/auth/cart/remove', function() use ($conn) {
+    $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode(CartController::removeFromCart($data, $conn));
-}, true);
+    echo json_encode(CartController::removeFromCart($authUserId, $data, $conn));
+},false, true);
 
+
+// ---------- 404 NOT FOUND ---------- //
 $router->setNotFound(function() {
     echo json_encode(['error' => 'Route not found']);
 });

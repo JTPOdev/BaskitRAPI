@@ -33,5 +33,14 @@ class Admin
         $stmt->bind_param("is", $adminId, $accessToken);
         return $stmt->execute();
     }
+    public static function getAdminIdByAccessToken($conn, $token)
+    {
+        $stmt = $conn->prepare("SELECT id FROM admin_access_tokens WHERE access_token = ?");
+        $stmt->bind_param("s", $token);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $admin = $result->fetch_assoc();
+        return $admin ? $admin['id'] : false;
+    }
 }
 ?>
