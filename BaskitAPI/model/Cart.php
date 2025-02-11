@@ -4,23 +4,23 @@ class Cart
 {
     public static function addToCart($userId, $productId, $quantity, $portion, $conn)
     {
-
         AuthMiddleware::checkAuth();
+        
         $userQuery = "SELECT * FROM users WHERE id = ?";
         $stmt = $conn->prepare($userQuery);
         $stmt->bind_param("i", $userId);
         $stmt->execute();
-        $userResult = $stmt->get_result(); //this or lagay ko nalang yung userexists ko sa user model
+        $userResult = $stmt->get_result();
     
         if ($userResult->num_rows === 0) {
-            return ['error' => 'User not found'];
+            return ['message' => 'User not found'];
         }
     
-        // Fetch product details
         $product = Product::getProductById($productId, $conn);
         if (!$product) {
-            return ['error' => 'Product not found'];
+            return ['message' => 'Product not found'];
         }
+    
         $sql = "SELECT * FROM cart WHERE user_id = ? AND product_id = ? AND product_portion = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iis", $userId, $productId, $portion);
@@ -28,34 +28,50 @@ class Cart
         $result = $stmt->get_result();
     
         if ($result->num_rows > 0) {
-            $sql = "UPDATE cart SET product_quantity = product_quantity + ? WHERE user_id = ? AND product_id = ? AND product_portion = ?";
+            $sql = "UPDATE cart 
+                    SET product_quantity = product_quantity + ? 
+                    WHERE user_id = ? AND product_id = ? AND product_portion = ?";
             $stmt = $conn->prepare($sql);
             $stmt->bind_param("iiis", $quantity, $userId, $productId, $portion);
         } else {
-            $query = "INSERT INTO cart (user_id, product_id, product_name, product_price, product_quantity, product_portion, product_origin) 
-                      VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $query = "INSERT INTO cart 
+                      (user_id, product_id, product_name, product_price, product_quantity, product_portion, product_origin, store_id, store_name) 
+                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
             $stmt = $conn->prepare($query);
-            $stmt->bind_param("iisdiss", $userId, $productId, $product['product_name'], $product['product_price'], $quantity, $portion, $product['product_origin']);  // Correct binding types
+            $stmt->bind_param("iisdissis", 
+                $userId, 
+                $productId, 
+                $product['product_name'], 
+                $product['product_price'], 
+                $quantity, 
+                $portion, 
+                $product['product_origin'], 
+                $product['store_id'], 
+                $product['store_name']
+            );
         }
-    
-        return $stmt->execute() ? ['success' => 'Added to cart'] : ['error' => 'Failed to add to cart'];
+        return $stmt->execute() ? ['message' => 'Added to cart'] : ['message' => 'Failed to add to cart'];
     }
+    
     
 
     public static function getUserCart($userId, $conn)
     {
-        $query = "SELECT * FROM cart WHERE user_id = ?";
+        $sql = "SELECT * FROM cart WHERE user_id = ?";
         
-        if ($stmt = $conn->prepare($query)) {
+        if ($stmt = $conn->prepare($sql)) {
             $stmt->bind_param("i", $userId);
             $stmt->execute();
             $result = $stmt->get_result();
             $cartItems = $result->fetch_all(MYSQLI_ASSOC);
             $stmt->close();
             
+            if (empty($cartItems)) {
+                return ['message' => 'Your Cart is Empty.'];
+            }
             return $cartItems;
         } else {
-            return ['error' => 'Failed to prepare statement.'];
+            return ['message' => 'Failed to prepare statement.'];
         }
     }
 
@@ -65,7 +81,7 @@ class Cart
         $sql = "UPDATE cart SET product_quantity = ? WHERE user_id = ? AND product_id = ? AND product_portion = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iiis", $quantity, $userId, $productId, $portion);
-        return $stmt->execute() ? ['success' => 'Cart updated'] : ['error' => 'Failed to update cart'];
+        return $stmt->execute() ? ['message' => 'Cart updated'] : ['message' => 'Failed to update cart'];
     }
 
     public static function removeFromCart($userId, $productId, $portion, $conn)
@@ -74,6 +90,7 @@ class Cart
         $sql = "DELETE FROM cart WHERE user_id = ? AND product_id = ? AND product_portion = ?";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("iis", $userId, $productId, $portion);
-        return $stmt->execute() ? ['success' => 'Removed from cart'] : ['error' => 'Failed to remove from cart'];
+        return $stmt->execute() ? ['message' => 'Removed from cart'] : ['message' => 'Failed to remove from cart'];
     }
 }
+?>

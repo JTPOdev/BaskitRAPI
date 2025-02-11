@@ -86,13 +86,13 @@ class Router
 $router = new Router();
 
 
-// ---------- AUTHENTICATION ---------- //
-$router->post('/api/auth/register', function() use ($conn) {
+// ---------- USER AUTHENTICATION ---------- //
+$router->post('/user/register', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(UserController::register($data, $conn));
 });
 
-$router->get('/api/auth/verify_email', function() use ($conn) {
+$router->get('/user/verify_email', function() use ($conn) {
     $verification_token = $_GET['token'] ?? null;
     echo json_encode($verification_token
         ? UserController::verifyEmail($verification_token, $conn)
@@ -100,52 +100,62 @@ $router->get('/api/auth/verify_email', function() use ($conn) {
     );
 });
 
-$router->post('/api/auth/login', function() use ($conn) {
+$router->post('/user/login', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(UserController::login($data, $conn));
 });
 
-$router->post('/api/auth/logout', function() use ($conn) {
-    AuthMiddleware::checkAuth();
+$router->post('/user/logout', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(UserController::logout($data, $conn));
-},true,false);
+});
 
 
-// ---------- ADMIN AUTH ---------- //
-$router->post('/api/auth/admin/register', function() use ($conn) {
+// ---------- ADMIN AUTHENTICATION ---------- //
+$router->post('/admin/changeCredentials', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
-    echo json_encode(AdminController::register($data, $conn));
+    echo json_encode(AdminController::changeCredentials($data, $conn));
 }, false, true);
 
-$router->post('/api/auth/admin/login', function() use ($conn) {
+$router->post('/admin/login', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(AdminController::login($data, $conn));
 });
 
+$router->post('/admin/logout', function() use ($conn) {
+    $data = json_decode(file_get_contents("php://input"), true);
+    echo json_encode(AdminController::logout($data, $conn));
+});
+
 
 // ---------- STORE ---------- //
-$router->post('/api/auth/store/create', function() use ($conn) {
+$router->post('/store/create', function() use ($conn) {
+    $adminId = AuthMiddleware::checkAuth(true);
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(StoreController::create($data, $conn));
 }, true, true);
 
-$router->get('/api/auth/store/list', function() use ($conn) {
+$router->get('/store/list', function() use ($conn) {
+    $adminId = AuthMiddleware::checkAuth(true);
     echo json_encode(StoreController::list($conn));
-}, false);
+}, true, true);
 
+$router->get('/store/list/{origin}', function($origin) use ($conn) {
+    $adminId = AuthMiddleware::checkAuth(false);
+    echo json_encode(StoreController::listByOrigin($origin, $conn));
+}, true , false);
 
 // ---------- PRODUCT ---------- //
-$router->post('/api/auth/product/create', function() use ($conn) {
+$router->post('/product/create', function() use ($conn) {
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(ProductController::create($data, $conn));
 }, true, true);
     
-$router->get('/api/auth/product/list', function() use ($conn) {
+$router->get('/product/list', function() use ($conn) {
     echo json_encode(ProductController::list($conn));
-}, true);
+}, true, true);
 
-$router->get('/api/auth/product/specific/{id}', function($id) use ($conn) {
+$router->get('/product/specific/{id}', function($id) use ($conn) {
     echo json_encode(ProductController::getSpecificProductByid($id, $conn));
 }, false);
 
@@ -153,32 +163,38 @@ $router->get('/api/auth/product/specific/{id}', function($id) use ($conn) {
 // ---------- PRODUCT CATEGORIES ---------- //
 $categories = ['fruit', 'vegetable', 'meat', 'fish', 'frozen', 'spice'];
 foreach ($categories as $category) {
-    $router->get("/api/auth/product/category/{$category}", function() use ($conn, $category) {
+    $router->get("/product/category/{$category}/{storeId}", function($storeId) use ($conn, $category) {
         $method = 'getProductsByCategory' . ucfirst($category);
+        echo json_encode(ProductController::$method($conn, $storeId));
+    });
+}
+
+foreach ($categories as $category) {
+    $router->get("/product/category/{$category}", function() use ($conn, $category) {
+        $method = 'getAllProductsByCategory' . ucfirst($category);
         echo json_encode(ProductController::$method($conn));
     });
 }
 
-
 // ---------- CART ---------- //
-$router->post('/api/auth/cart/add', function() use ($conn) {
+$router->post('/cart/add', function() use ($conn) {
     $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(CartController::addToCart($authUserId, $data, $conn));
 }, false, true);
 
-$router->get('/api/auth/cart/view/{user_id}', function() use ($conn) {
+$router->get('/cart/view/{user_id}', function() use ($conn) {
     $authUserId = AuthMiddleware::checkAuth();
     echo json_encode(CartController::viewCart($authUserId,$conn));
 }, false, true);
 
-$router->put('/api/auth/cart/update', function() use ($conn) {
+$router->put('/cart/update', function() use ($conn) {
     $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(CartController::updateCart($authUserId, $data, $conn));
 },false, true);
 
-$router->delete('/api/auth/cart/remove', function() use ($conn) {
+$router->delete('/cart/remove', function() use ($conn) {
     $authUserId = AuthMiddleware::checkAuth();
     $data = json_decode(file_get_contents("php://input"), true);
     echo json_encode(CartController::removeFromCart($authUserId, $data, $conn));
@@ -187,7 +203,7 @@ $router->delete('/api/auth/cart/remove', function() use ($conn) {
 
 // ---------- 404 NOT FOUND ---------- //
 $router->setNotFound(function() {
-    echo json_encode(['error' => 'Route not found']);
+    echo json_encode(['message' => 'Route not found']);
 });
 
 $router->dispatch();

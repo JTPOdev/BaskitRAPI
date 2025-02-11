@@ -25,10 +25,15 @@ class AuthMiddleware
                 if ($userId) {
                     return $userId;
                 }
+
+                $adminId = Admin::getAdminIdByAccessToken($conn, $accessToken);
+                if ($adminId) {
+                    return $adminId;
+                }
             }
         }
         header('HTTP/1.1 401 Unauthorized');
-        echo json_encode(['error' => 'Unauthorized access.']);
+        echo json_encode(['message' => 'Unauthorized access.']);
         exit;
     }
 }

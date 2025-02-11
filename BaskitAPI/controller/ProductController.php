@@ -6,75 +6,199 @@ class ProductController
 {
     public static function create($data, $conn)
     {
-        $requiredFields = ['product_name', 'product_price', 'product_description', 'product_category', 'product_origin', 'product_rating', 'store_id'];
-    
+
+        $name = $data['product_name'];
+        $price = $data['product_price'];
+        $category = $data['product_category'];
+        $storeId = $data['store_id'];
+
+        $requiredFields = ['product_name', 'product_price', 'product_category', 'store_id'];
         foreach ($requiredFields as $field) {
             if (!isset($data[$field]) || empty($data[$field])) {
-                return ['error' => "Missing required field: $field"];
+                header('HTTP/1.1 400 Bad Request');
+                return ['message' => "Missing required field: $field"];
             }
         }
     
-        $name = $data['product_name'];
-        $price = $data['product_price'];
-        $description = $data['product_description'];
-        $category = $data['product_category'];
-        $origin = $data['product_origin'];
-        $rating = $data['product_rating'];
-        $storeId = $data['store_id'];
     
         $validCategories = ['STORE', 'FRUITS', 'VEGETABLES', 'MEAT', 'FISH', 'FROZEN', 'SPICES'];
         $validOrigins = ['DAGUPAN', 'CALASIAO'];
     
         if (!in_array($category, $validCategories)) {
-            return ['error' => "Invalid category: $category"];
-        }
-    
-        if (!in_array($origin, $validOrigins)) {
-            return ['error' => "Invalid origin: $origin"];
+            header('HTTP/1.1 400 Bad Request');
+            return ['message' => "Invalid category: $category"];
         }
     
         $store = Store::getStoreById($conn, $storeId);
         if (!$store) {
-            return ['error' => 'Invalid store_id. Store does not exist.'];
+            header('HTTP/1.1 404 Not Found');
+            return ['message' => 'Invalid store_id. Store does not exist.'];
         }
     
-        if (Product::createProduct($conn, $name, $price, $description, $category, $origin, $rating, $storeId)) {
-            return ['success' => 'Product created successfully'];
+        if (Product::createProduct($conn, $name, $price, $category, $storeId)) {
+            header('HTTP/1.1 201 Created');
+            return ['message' => 'Product created successfully'];
         }
     
-        return ['error' => 'Failed to create product'];
+        header('HTTP/1.1 500 Internal Server Error');
+        return ['message' => 'Failed to create product'];
     }
 
-    public static function list($conn){
-        return Product::getProducts($conn);
+    public static function list($conn)
+    {
+        $products = Product::getProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found'];
     }
 
-    public static function getSpecificProductByid($id, $conn){
-        return Product::getProductById($id, $conn);
+    public static function getSpecificProductByid($id, $conn)
+    {
+        $product = Product::getProductById($id, $conn);
+        if ($product) {
+            header('HTTP/1.1 200 OK');
+            return $product;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'Product not found'];
     }
 
-    public static function getProductsByCategoryFruit($conn) {
-        return Product::fetchByCategoryFruit($conn);
-    }
-    public static function getProductsByCategoryVegetable($conn) {
-        return Product::fetchByCategoryVegetable($conn);
-    }
-
-    public static function getProductsByCategoryMeat($conn) {
-        return Product::fetchByCategoryMeat($conn);
-    }
-
-    public static function getProductsByCategoryFish($conn) {
-        return Product::fetchByCategoryFish($conn);
+    //--------- GET ALL PRODUCTS FROM STORE BY CATEGORY---------// 
+    public static function getProductsByCategoryFruit($conn, $storeId)
+    {
+        $products = Product::fetchByCategoryFruit($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FRUITS category'];
     }
 
-    public static function getProductsByCategoryFrozen($conn) {
-        return Product::fetchByCategoryFrozen($conn);
+    public static function getProductsByCategoryVegetable($conn, $storeId)
+    {
+        $products = Product::fetchByCategoryVegetable($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in VEGETABLES category'];
     }
 
-    public static function getProductsByCategorySpice($conn) {
-        return Product::fetchByCategorySpice($conn);
+    public static function getProductsByCategoryMeat($conn, $storeId)
+    {
+        $products = Product::fetchByCategoryMeat($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in MEAT category'];
     }
 
+    public static function getProductsByCategoryFish($conn, $storeId)
+    {
+        $products = Product::fetchByCategoryFish($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FISH category'];
+    }
+
+    public static function getProductsByCategoryFrozen($conn, $storeId)
+    {
+        $products = Product::fetchByCategoryFrozen($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FROZEN category'];
+    }
+
+    public static function getProductsByCategorySpice($conn, $storeId)
+    {
+        $products = Product::fetchByCategorySpice($conn, $storeId);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in SPICES category'];
+    }
+
+
+    //---------- GET ALL PRODUCTS BY CATEGORY --------//
+    public static function getAllProductsByCategoryFruit($conn)
+    {
+        $products = Product::fetchAllFruitProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FRUITS category'];
+    }
+
+    public static function getAllProductsByCategoryVegetable($conn)
+    {
+        $products = Product::fetchAllVegetableProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in VEGETABLES category'];
+    }
+
+    public static function getAllProductsByCategoryMeat($conn)
+    {
+        $products = Product::fetchAllMeatProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in MEAT category'];
+    }
+
+    public static function getAllProductsByCategoryFish($conn)
+    {
+        $products = Product::fetchAllFishProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FISH category'];
+    }
+
+    public static function getAllProductsByCategoryFrozen($conn)
+    {
+        $products = Product::fetchAllFrozenProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in FROZEN category'];
+    }
+
+    public static function getAllProductsByCategorySpice($conn)
+    {
+        $products = Product::fetchAllSpiceProducts($conn);
+        if ($products) {
+            header('HTTP/1.1 200 OK');
+            return $products;
+        }
+        header('HTTP/1.1 404 Not Found');
+        return ['message' => 'No products found in SPICES category'];
+    }
 }
 ?>

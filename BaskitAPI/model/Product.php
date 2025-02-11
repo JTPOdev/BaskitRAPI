@@ -2,9 +2,9 @@
 
 class Product
 {
-    public static function createProduct($conn, $name, $price, $description, $category, $origin, $rating, $storeId)
+    public static function createProduct($conn, $name, $price, $category, $storeId)
     {
-        $storeQuery = "SELECT store_name, store_phone_number FROM stores WHERE id = ?";
+        $storeQuery = "SELECT store_name, owner_name, store_phone_number, store_origin FROM stores WHERE id = ?";   
         $stmtStore = $conn->prepare($storeQuery);
         $stmtStore->bind_param("i", $storeId);
         $stmtStore->execute();
@@ -16,18 +16,20 @@ class Product
         }
     
         $storeName = $store['store_name'];
+        $ownerName = $store['owner_name'];
         $storePhone = $store['store_phone_number'];
-    
-        $sql = "INSERT INTO products (product_name, product_price, product_description, product_category, product_origin, product_rating, store_id, store_name, store_phone_number)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        $storeOrigin = $store['store_origin'];
+  
+        $sql = "INSERT INTO products (product_name, product_price, product_category, product_origin, store_id, store_name, owner_name, store_phone_number)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $conn->prepare($sql);
-        $stmt->bind_param("sdsssisss", $name, $price, $description, $category, $origin, $rating, $storeId, $storeName, $storePhone);
+        $stmt->bind_param("sdssisss", $name, $price, $category, $storeOrigin, $storeId, $storeName, $ownerName, $storePhone);
         return $stmt->execute();
     }
 
     public static function getProducts($conn)
     {
-        $sql = "SELECT p.*, s.store_name, s.store_phone_number 
+        $sql = "SELECT p.*, s.store_name, s.owner_name, s.store_phone_number 
                 FROM products p 
                 JOIN stores s ON p.store_id = s.id";
         $result = $conn->query($sql);
@@ -35,7 +37,7 @@ class Product
     }
     
     public static function getProductById($id, $conn) {
-        $sql = "SELECT p.*, s.store_name, s.store_phone_number 
+        $sql = "SELECT p.*, s.store_name, s.owner_name, s.store_phone_number 
                 FROM products p 
                 JOIN stores s ON p.store_id = s.id
                 WHERE p.id = ?";
@@ -49,21 +51,82 @@ class Product
         if ($product) {
             return $product;
         } else {
-            return ['error' => 'Product not found'];
+            return ['message' => 'Product not found'];
         }
     }
     
-    //--------- CATEGORY ---------// (FETCHING ALL PRODUCTS FROM EACH CATEGORY IN ALL STORES )
-    public static function fetchByCategoryFruit($conn)
+    //--------- FETCH ALL PRODUCTS FROM STORE BY CATEGORY---------// 
+    public static function fetchByCategoryFruit($conn, $storeId)
     {
-        $sql = "SELECT * FROM products WHERE product_category = 'FRUITS'";
+        $sql = "SELECT * FROM products WHERE product_category = 'FRUITS' AND store_id = ?" ;
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryVegetable($conn, $storeId)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'VEGETABLES' AND store_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryMeat($conn, $storeId)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'MEAT' AND store_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryFish($conn, $storeId)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FISH' AND store_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategoryFrozen($conn, $storeId)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FROZEN' AND store_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    public static function fetchByCategorySpice($conn, $storeId)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'SPICES' AND store_id = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("i", $storeId);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        return $result->fetch_all(MYSQLI_ASSOC);
+    }
+
+    //---------- FETCH ALL PRODUCTS BY CATEGORY --------//
+    public static function fetchAllFruitProducts($conn)
+    {
+        $sql = "SELECT * FROM products WHERE product_category = 'FRUITS'" ;
         $stmt = $conn->prepare($sql);
         $stmt->execute();
         $result = $stmt->get_result();
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function fetchByCategoryVegetable($conn)
+    public static function fetchAllVegetableProducts($conn)
     {
         $sql = "SELECT * FROM products WHERE product_category = 'VEGETABLES'";
         $stmt = $conn->prepare($sql);
@@ -72,7 +135,7 @@ class Product
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function fetchByCategoryMeat($conn)
+    public static function fetchAllMeatProducts($conn)
     {
         $sql = "SELECT * FROM products WHERE product_category = 'MEAT'";
         $stmt = $conn->prepare($sql);
@@ -81,7 +144,7 @@ class Product
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function fetchByCategoryFish($conn)
+    public static function fetchAllFishProducts($conn)
     {
         $sql = "SELECT * FROM products WHERE product_category = 'FISH'";
         $stmt = $conn->prepare($sql);
@@ -90,7 +153,7 @@ class Product
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function fetchByCategoryFrozen($conn)
+    public static function fetchAllFrozenProducts($conn)
     {
         $sql = "SELECT * FROM products WHERE product_category = 'FROZEN'";
         $stmt = $conn->prepare($sql);
@@ -99,7 +162,7 @@ class Product
         return $result->fetch_all(MYSQLI_ASSOC);
     }
 
-    public static function fetchByCategorySpice($conn)
+    public static function fetchAllSpiceProducts($conn)
     {
         $sql = "SELECT * FROM products WHERE product_category = 'SPICES'";
         $stmt = $conn->prepare($sql);
