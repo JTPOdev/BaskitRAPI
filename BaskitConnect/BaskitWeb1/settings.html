@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Settings</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+        <nav>
+            <h1>Baskit</h1>
+            <ul>
+                <li>
+                    <button id="overviewButton">Overview <span class="overview-icon"> > </span></button>
+                    <ul class="overview" id="overviewMenu">
+                        <li><a href="#">Summary</a></li>
+                        <li><a href="#">Custom View</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <button id="productsButton">Products <span class="products-icon"> > </span></button>
+                    <ul class="products" id="productsMenu">
+                        <li><button class="dagupanBtn">Dagupan</button></li>
+                        <li><button class="calasiaoBtn">Calasiao</button></li>
+                    </ul>
+                </li>
+                <li><a href="#">Orders</a></li>
+                <li class="customers"><a href="#">Customers</a></li>
+                <hr>
+                <li><a href="settings.html" id="settingsLink">Settings</a></li>
+                <li><button id="logoutButton" class="logout-btn">Logout</button></li> 
+            </ul>
+        </nav>
+    
+        <div class="settings-container">
+            <h2>Update Account Settings</h2>
+            <form id="settingsForm">
+                <label for="newUsername">New Username:</label>
+                <input type="text" id="newUsername" required>
+    
+                <label for="oldPassword">Current Password:</label>
+                <input type="password" id="oldPassword" required>
+                
+                <label for="newPassword">New Password:</label>
+                <input type="password" id="newPassword" required>
+    
+                <label for="confirmPassword">Confirm New Password:</label>
+                <input type="password" id="confirmPassword" required>
+    
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    
+        <div class="locationBtn">
+            <button class="dagupanBtn">Dagupan</button>
+            <button class="calasiaoBtn">Calasiao</button>
+        </div>
+
+        <script>
+            document.getElementById("overviewButton").addEventListener("click", function(event) {
+                event.preventDefault();
+                var overview = document.getElementById("overviewMenu");
+                var icon = document.querySelector(".overview-icon");
+            
+                overview.style.display = (overview.style.display === "block") ? "none" : "block";
+                icon.classList.toggle("rotated");
+            
+                navLinks.forEach(link => {
+                    if (link !== this) {
+                        link.classList.remove('active');
+                    }
+                });
+            });
+            
+            document.getElementById("productsButton").addEventListener("click", function(event) {
+                event.preventDefault();
+                var products = document.getElementById("productsMenu");
+                var icon = document.querySelector(".products-icon");
+            
+                products.style.display = (products.style.display === "block") ? "none" : "block";
+                icon.classList.toggle("rotated");
+            
+                navLinks.forEach(link => {
+                    if (link !== this) {
+                        link.classList.remove('active');
+                    }
+                });
+            });
+            
+            const navLinks = document.querySelectorAll('nav ul li a');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function () {
+                    navLinks.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+            
+                // Logout Function
+                document.getElementById("logoutButton").addEventListener("click", function() {
+                    if (confirm("Are you sure you want to log out?")) {
+                        sessionStorage.clear();
+                        localStorage.clear();
+                        window.location.href = "login.html"; 
+                    }
+                });
+            
+            
+            const headerLeft = document.querySelector('.header-left');
+            const dagupanBtn = document.querySelector('.dagupanBtn');
+            const calasiaoBtn = document.querySelector('.calasiaoBtn');
+            const storeContainer = document.getElementById('storeContainer');
+            const locationBtnGroup = document.querySelector('.locationBtn');
+            const storeForm = document.getElementById('storeForm');
+            const storeDetailsForm = document.getElementById('storeDetailsForm');
+            const storeOriginField = document.getElementById('storeOrigin');
+            
+            let selectedLocation = '';
+            let storeDataByLocation = {
+                Dagupan: [],
+                Calasiao: []
+            };
+            
+            let storeIdCounter = 1;
+            
+            dagupanBtn.addEventListener('click', () => handleLocationSelection('Dagupan'));
+            calasiaoBtn.addEventListener('click', () => handleLocationSelection('Calasiao'));
+            
+            function handleLocationSelection(location) {
+                selectedLocation = location;
+                document.querySelector('.header-left').innerHTML = `<h2>${location}</h2>`;
+            
+                locationBtnGroup.style.display = 'none';
+                storeContainer.style.display = 'flex';
+            
+                renderStoresForLocation();
+            }
+            
+            document.getElementById('addStoreBtn').addEventListener('click', () => {
+                storeForm.style.display = 'block';
+                storeOriginField.value = selectedLocation || 'Select Location First';
+            });
+            
+            storeDetailsForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+            
+                const storeData = {
+                    id: document.getElementById('storeId').value || storeIdCounter++,  
+                    name: document.getElementById('storeName').value,
+                    owner: document.getElementById('ownerName').value,
+                    phone: document.getElementById('storePhone').value,
+                    origin: storeOriginField.value,
+                    status: document.querySelector('input[name="storeType"]:checked').value,
+                };
+            
+                if (selectedLocation) {
+                    storeDataByLocation[selectedLocation].push(storeData);
+                }
+            
+                storeForm.style.display = 'none';
+                storeDetailsForm.reset();
+                storeOriginField.value = selectedLocation;
+            
+                renderStoresForLocation();
+            });
+            
+            document.querySelectorAll('.dropdown-content a').forEach(function(link) {
+                link.addEventListener('click', function(event) {
+                    event.preventDefault();
+            
+                    const filterType = this.getAttribute('data-filter');
+                    const stores = storeDataByLocation[selectedLocation] || [];
+                    
+                    let filteredStores = (filterType === 'all') ? stores : stores.filter(store => store.status.toLowerCase() === filterType.toLowerCase());
+            
+                    document.getElementById('storeList').innerHTML = '';
+                    filteredStores.forEach(displayStoreCard);
+                });
+            });
+            
+            document.getElementById('closeStoreFormBtn').addEventListener('click', function() {
+                storeForm.style.display = 'none'; 
+            });
+            
+            function renderStoresForLocation() {
+                document.getElementById('storeList').innerHTML = '';
+                (storeDataByLocation[selectedLocation] || []).forEach(displayStoreCard);
+            }
+            
+            function displayStoreCard(storeData) {
+                const storeContainer = document.createElement('div');
+                storeContainer.classList.add('store-card');
+            
+                storeContainer.innerHTML = `
+                    <h3>${storeData.name}</h3>
+                    <p><strong>Owner:</strong> ${storeData.owner}</p>
+                    <p><strong>Phone:</strong> ${storeData.phone}</p>
+                    <p><strong>Origin:</strong> ${storeData.origin}</p>
+                    <p><strong>Status:</strong> ${storeData.status}</p>
+                `;
+            
+                storeContainer.addEventListener('click', () => {
+                    showStoreDetails(storeData);
+                });
+            
+                document.getElementById('storeList').appendChild(storeContainer);
+            }
+            
+            function showStoreDetails(storeData) {
+                headerLeft.innerHTML = `
+                    <h2>${storeData.name}</h2>
+                    <p><strong>Owner:</strong> ${storeData.owner} | 
+                    <strong>Phone:</strong> ${storeData.phone} | 
+                    <strong>Origin:</strong> ${storeData.origin} | 
+                    <strong>Status:</strong> ${storeData.status}</p>
+                `;
+            
+                document.getElementById('storeContainer').style.display = 'none';
+                document.getElementById('storeDetailContainer').style.display = 'block';
+                document.getElementById('storeDetailContent').innerHTML = '';
+            
+                document.getElementById('storeID').value = storeData.id;
+            }
+            
+            document.getElementById('backToStoreListBtn').addEventListener('click', function() {
+                document.getElementById('storeDetailContainer').style.display = 'none';
+                document.getElementById('storeContainer').style.display = 'flex';
+            
+                headerLeft.innerHTML = `<h2>${selectedLocation}</h2>`;
+            });
+            
+            // Product Management
+            const addProductBtn = document.getElementById('addProductBtn');
+            const addProductFormContainer = document.getElementById('addProductFormContainer');
+            const closeProductFormBtn = document.getElementById('closeProductFormBtn');
+            const productForm = document.getElementById('productForm');
+            const storeDetailContent = document.getElementById('storeDetailContent');
+            
+            let productList = [];
+            
+            addProductBtn.addEventListener('click', function() {
+                addProductFormContainer.style.display = 'block';
+            });
+            
+            closeProductFormBtn.addEventListener('click', function() {
+                addProductFormContainer.style.display = 'none';
+            });
+            
+            productForm.addEventListener('submit', function(event) {
+                event.preventDefault();
+            
+                const productData = {
+                    name: document.getElementById('productName').value,
+                    price: `₱${parseFloat(document.getElementById('productPrice').value).toFixed(2)}`,
+                    category: document.getElementById('productCategory').value,
+                    origin: document.getElementById('productOrigin').value,
+                    storeID: document.getElementById('storeID').value,
+                    storeName: document.querySelector('.header-left h2').innerText
+                };
+            
+                productList.push(productData);
+                displayProducts();
+                addProductFormContainer.style.display = 'none';
+                productForm.reset();
+            });
+            
+            function displayProducts(category = 'all') {
+                storeDetailContent.innerHTML = '';
+            
+                productList.forEach(product => {
+                    if (category === 'all' || product.category === category) {
+                        const productContainer = document.createElement('div');
+                        productContainer.classList.add('container');
+            
+                        productContainer.innerHTML = `
+                            <h3>${product.name}</h3>
+                            <p><strong>Price:</strong> ${product.price}</p>
+                            <p><strong>Category:</strong> ${product.category}</p>
+                            <p><strong>Store:</strong> ${product.storeName}</p>
+                        `;
+            
+                        storeDetailContent.appendChild(productContainer);
+                    }
+                });
+            }
+            
+            
+            
+        </script>
+    </body>
+</html>

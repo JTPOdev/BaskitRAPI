@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Stores</title>
+        <link rel="stylesheet" href="stores.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+<body>
+
+    <nav>
+        <div class="nav-header">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo">
+            </div>
+            <h1>Baskit</h1>
+        </div>
+
+        <ul>
+            <li><a href="dashboard.html"><i class="fa-solid fa-chart-simple"></i></i> Dashboard</a></li>
+            <li ><a href="stores.html"><i class="fas fa-store"></i> Stores </a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i> Orders</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="admin.html"><i class="fa-solid fa-user-tie"></i></i>Admin</a></li>
+            <li><a href="logout.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="header-left">
+            <h1><span>Stores</span></h1>
+        </div>
+        <div class="search-notification">
+            <div class="search">
+                <i class="fa-solid fa-magnifying-glass"></i>   
+                <input type="text" name="" id="search" placeholder="Search">
+            </div>
+            <div class="notification">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+
+        <div id="storeInfo" class="store-info" style="display: none;">
+            <p><strong>Owner:</strong> <span id="storeOwner"></span></p>
+            <p><strong>Contact:</strong> <span id="storeContact"></span></p>
+            <p><strong>Status:</strong> <span id="storeStatus"></span></p>
+        </div>
+
+        <div class="container-controls">
+            <select id="filterSelect">
+                <option value="" disabled selected>Store Type</option>
+                <option value="all">All</option>
+                <option value="partnership">Partnership</option>
+                <option value="standard">Standard</option>
+            </select>
+
+            <select id="locationSelect">
+                <option value="" disabled selected>Location</option>
+                <option value="all">All</option>
+                <option value="dagupan">Dagupan</option>
+                <option value="calasiao">Calasiao</option>
+            </select>
+
+            <button id="backButton" class="backBtn" style="display: none;">Back</button>  
+            
+            <select id="categorySelect" style="display: none;">
+                <option value="all" selected>All</option>
+                <option value="fruit">Fruit</option>
+                <option value="vegetable">Vegetable</option>
+                <option value="meat">Meat</option>
+                <option value="fish">Fish</option>
+                <option value="frozen">Frozen</option>
+                <option value="spices">Spices</option>
+            </select>
+        </div>
+    
+        <div id="storeContainer" class="store-list"></div>
+        
+        <div id="productContainer" class="product-container" style="display: none;">
+
+
+            <div id="productList" class="product-list"></div>
+        </div>
+        
+        
+
+    </div>
+    
+
+    <script src="stores.js"></script> 
+    
+</body>
+</html>

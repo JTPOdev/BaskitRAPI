@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Document</title>
+        <link rel="stylesheet" href="style.css">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+<body>
+    <nav>
+        <h1>Baskit</h1>
+        <ul>
+            <li>
+                <button id="overviewButton">Overview <span class="overview-icon"> > </span></button>
+                <ul class="overview" id="overviewMenu">
+                    <li><a href="#">Summary</a></li>
+                    <li><a href="#">Custom View</a></li>
+                </ul>
+            </li>
+            <li>
+                <button id="productsButton">Products <span class="products-icon"> > </span></button>
+                <ul class="products" id="productsMenu">
+                    <li><button class="dagupanBtn">Dagupan</button></li>
+                    <li><button class="calasiaoBtn">Calasiao</button></li>
+                </ul>
+            </li>
+            <li><a href="#">Orders</a></li>
+            <li class="customers"><a href="#">Customers</a></li>
+            <hr>
+            <li><a href="settings.html" id="settingsLink">Settings</a></li>
+            <li><button id="logoutButton" class="logout-btn">Logout</button></li> 
+        </ul>
+    </nav>
+    
+
+
+    <header>
+        <div class="header-left">
+            <h1>Welcome back, User</h1>
+            <h3>Here are today's status</h3>
+        </div>
+        <div class="search-notification">
+            <div class="search">
+                <i class="fa-solid fa-magnifying-glass"></i>   
+                <input type="text" name="" id="search" placeholder="Search">
+            </div>
+            <div class="notification">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="locationBtn">
+        <button class="dagupanBtn">Dagupan</button>
+        <button class="calasiaoBtn">Calasiao</button>
+    </div>
+    
+
+    <div class="storeContainer" id="storeContainer">
+        <div class="container-controls">
+            <button id="addStoreBtn">Add Store</button>
+            <div class="dropdown">
+                <button id="filterBtn">Store Type</button>
+                <div class="dropdown-content">
+                    <a href="#" data-filter="all">All</a>
+                    <a href="#" data-filter="partnership">Partnership</a>
+                    <a href="#" data-filter="standard">Standard</a>
+                </div>
+            </div>
+        </div>
+    
+        <div id="storeForm" class="store-form">
+            <h3>Add Store</h3>
+            <form id="storeDetailsForm">
+                
+                <label for="storeName">Store Name:</label>
+                <input type="text" id="storeName" name="storeName" placeholder="Store name" required>
+                
+                <label for="ownerName">Owner Name:</label>
+                <input type="text" id="ownerName" name="ownerName" placeholder="Owner name" required>
+                
+                <label for="storePhone">Phone Number:</label>
+                <input type="tel" id="storePhone" name="storePhone" placeholder="Phone number" required>
+                
+                <label for="storeOrigin">Store Origin:</label>
+                <input type="text" id="storeOrigin" name="storeOrigin" readonly>
+                
+                <label for="storeId">Store ID:</label>
+                <input type="number" id="storeId" name="storeId" placeholder="Store ID" required>
+
+                <label for="storeStatus">Store Status:</label>
+                <div id="storeStatus">
+                    <input type="radio" id="partnership" name="storeType" value="Partner" required>
+                    <label for="partnership">Partnership</label>
+                    <input type="radio" id="standard" name="storeType" value="Standard" required>
+                    <label for="standard">Standard</label>
+                </div>
+        
+                <div class="form-controls">
+                    <button type="submit" class="submit-btn">Submit</button>
+                    <button type="button" id="closeStoreFormBtn" class="close-btn">Close</button>
+                </div>
+            </form>
+        </div>
+        
+
+        <div class="store-list" id="storeList"></div>
+    </div>
+    
+    <div id="storeDetailContainer" class="storeDetailContainer">
+        <div class="container-controls">
+            <button id="backToStoreListBtn" class="action-btn">Back</button>
+            <button id="addProductBtn" class="action-btn">Add Product</button>
+            <div class="dropdown">
+                <button id="filterBtn">Product Category</button>
+                <div class="dropdown-content">
+                    <a href="#" data-filter="all">All Products</a>
+                    <a href="#" data-filter="FRUITS">FRUITS</a>
+                    <a href="#" data-filter="VEGETABLES">VEGETABLES</a>
+                    <a href="#" data-filter="MEAT">MEAT</a>
+                    <a href="#" data-filter="FISH">FISH</a>
+                    <a href="#" data-filter="FROZEN">FROZEN</a>
+                    <a href="#" data-filter="SPICES">SPICES</a>
+                </div>
+            </div>
+        </div>
+    
+        <div id="storeDetailContent" class="store-detail-content">
+
+        </div>
+    
+
+        <div id="addProductFormContainer" class="addProductFormContainer">
+            <h2>Add Product</h2>
+            <form id="productForm">
+                <div class="form-group">
+                    <label for="productName">Product Name:</label>
+                    <input type="text" id="productName" name="productName" placeholder="Enter product name" required>
+                </div>
+    
+                <div class="form-group">
+                    <label for="productPrice">Product Price:</label>
+                    <input 
+                        type="number" 
+                        id="productPrice" 
+                        name="productPrice" 
+                        step="0.01" 
+                        min="0" 
+                        placeholder="Enter product price" 
+                        required
+                    >
+                </div>
+    
+                <div class="form-group">
+                    <label for="productCategory">Product Category:</label>
+                    <select id="productCategory" required>
+                        <option value="FRUITS">FRUITS</option>
+                        <option value="VEGETABLES">VEGETABLES</option>
+                        <option value="MEAT">MEAT</option>
+                        <option value="FISH">FISH</option>
+                        <option value="FROZEN">FROZEN</option>
+                        <option value="SPICES">SPICES</option>
+                    </select>
+                </div>
+    
+                <input type="hidden" id="storeID" name="storeID" required>
+    
+                <div class="form-group">
+                    <label for="productOrigin">Product Origin:</label>
+                    <input type="text" id="productOrigin" name="productOrigin" value="Dagupan" disabled>
+                </div>
+    
+                <button type="submit" id="submitProductButton" class="submit-btn">Submit</button>
+                <button type="button" id="closeProductFormBtn" class="close-btn">Close</button>
+            </form>
+        </div>
+    </div>
+    
+    
+
+    
+
+
+    <script>
+        const BASE_URL = "192.168.100.111";
+        
+        document.getElementById("overviewButton").addEventListener("click", function(event) {
+            event.preventDefault();
+            var overview = document.getElementById("overviewMenu");
+            var icon = document.querySelector(".overview-icon");
+        
+            overview.style.display = (overview.style.display === "block") ? "none" : "block";
+            icon.classList.toggle("rotated");
+        
+            navLinks.forEach(link => {
+                if (link !== this) {
+                    link.classList.remove('active');
+                }
+            });
+        });
+        
+        document.getElementById("productsButton").addEventListener("click", function(event) {
+            event.preventDefault();
+            var products = document.getElementById("productsMenu");
+            var icon = document.querySelector(".products-icon");
+        
+            products.style.display = (products.style.display === "block") ? "none" : "block";
+            icon.classList.toggle("rotated");
+        
+            navLinks.forEach(link => {
+                if (link !== this) {
+                    link.classList.remove('active');
+                }
+            });
+        });
+        
+        const navLinks = document.querySelectorAll('nav ul li a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', function () {
+                navLinks.forEach(nav => nav.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+        
+        // Update the logout button event listener
+        document.getElementById("logoutButton").addEventListener("click", async function() {
+            if (confirm("Are you sure you want to log out?")) {
+                const token = localStorage.getItem('access_token');
+                
+                try {
+                    const response = await fetch('http://localhost/Baskit/BaskitAPI/public/admin/logout', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        // Clear local storage
+                        localStorage.clear();
+                        // Redirect to login page
+                        window.location.href = "login.html";
+                    } else {
+                        alert(data.message || 'Logout failed');
+                    }
+                } catch (error) {
+                    console.error('Error during logout:', error);
+                    alert('An error occurred during logout');
+                }
+            }
+        });
+        
+        
+        const headerLeft = document.querySelector('.header-left');
+        const dagupanBtn = document.querySelector('.dagupanBtn');
+        const calasiaoBtn = document.querySelector('.calasiaoBtn');
+        const storeContainer = document.getElementById('storeContainer');
+        const locationBtnGroup = document.querySelector('.locationBtn');
+        const storeForm = document.getElementById('storeForm');
+        const storeDetailsForm = document.getElementById('storeDetailsForm');
+        const storeOriginField = document.getElementById('storeOrigin');
+        
+        let selectedLocation = '';
+        let storeDataByLocation = {
+            Dagupan: [],
+            Calasiao: []
+        };
+        
+        let storeIdCounter = 1;
+        
+        dagupanBtn.addEventListener('click', () => handleLocationSelection('Dagupan'));
+        calasiaoBtn.addEventListener('click', () => handleLocationSelection('Calasiao'));
+        
+        function handleLocationSelection(location) {
+            selectedLocation = location;
+            document.querySelector('.header-left').innerHTML = `<h2>${location}</h2>`;
+        
+            locationBtnGroup.style.display = 'none';
+            storeContainer.style.display = 'flex';
+        
+            renderStoresForLocation();
+        }
+        
+        document.getElementById('addStoreBtn').addEventListener('click', () => {
+            storeForm.style.display = 'block';
+            storeOriginField.value = selectedLocation || 'Select Location First';
+        });
+        
+        function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'login.html';
+            }
+            return token;
+        }
+        
+        storeDetailsForm.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            const token = checkAuth();
+        
+            const storeData = {
+                store_name: document.getElementById('storeName').value,
+                owner_name: document.getElementById('ownerName').value,
+                store_phone_number: document.getElementById('storePhone').value,
+                store_origin: storeOriginField.value.toUpperCase(),
+                store_status: document.querySelector('input[name="storeType"]:checked').value
+            };
+        
+            try {
+                const response = await fetch('http://localhost/Baskit/BaskitAPI/public/store/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(storeData)
+                });
+        
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Server returned invalid JSON');
+                }
+        
+                if (response.ok) {
+                    alert('Store created successfully!');
+            storeForm.style.display = 'none';
+            storeDetailsForm.reset();
+            renderStoresForLocation();
+                } else {
+                    alert(data.message || 'Failed to create store');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while creating the store');
+            }
+        });
+        
+        document.querySelectorAll('.dropdown-content a').forEach(function(link) {
+            link.addEventListener('click', async function(event) {
+                event.preventDefault();
+                const filterType = this.getAttribute('data-filter');
+                console.log('Filtering by category:', filterType);
+                await displayProducts(filterType);
+            });
+        });
+        
+        document.getElementById('closeStoreFormBtn').addEventListener('click', function() {
+            storeForm.style.display = 'none'; 
+        });
+        
+        async function renderStoresForLocation() {
+            const token = checkAuth();
+            try {
+                const response = await fetch(`http://localhost/Baskit/BaskitAPI/public/store/list/${selectedLocation.toUpperCase()}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let stores;
+                try {
+                    stores = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Server returned invalid JSON');
+                }
+
+            document.getElementById('storeList').innerHTML = '';
+                
+                if (Array.isArray(stores)) {
+                    stores.forEach(store => {
+                        displayStoreCard({
+                            id: store.id,
+                            name: store.store_name,
+                            owner: store.owner_name,
+                            phone: store.store_phone_number,
+                            origin: store.store_origin,
+                            status: store.store_status
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Failed to fetch stores');
+            }
+        }
+        
+        function displayStoreCard(storeData) {
+            const storeContainer = document.createElement('div');
+            storeContainer.classList.add('store-card');
+        
+            storeContainer.innerHTML = `
+                <h3>${storeData.name}</h3>
+                <p><strong>Owner:</strong> ${storeData.owner}</p>
+                <p><strong>Phone:</strong> ${storeData.phone}</p>
+                <p><strong>Origin:</strong> ${storeData.origin}</p>
+                <p><strong>Status:</strong> ${storeData.status}</p>
+            `;
+        
+            storeContainer.addEventListener('click', () => {
+                showStoreDetails(storeData);
+            });
+        
+            document.getElementById('storeList').appendChild(storeContainer);
+        }
+        
+        async function showStoreDetails(storeData) {
+            headerLeft.innerHTML = `
+                <h2>${storeData.name}</h2>
+                <p><strong>Owner:</strong> ${storeData.owner} | 
+                <strong>Phone:</strong> ${storeData.phone} | 
+                <strong>Origin:</strong> ${storeData.origin} | 
+                <strong>Status:</strong> ${storeData.status}</p>
+            `;
+        
+            document.getElementById('storeContainer').style.display = 'none';
+            document.getElementById('storeDetailContainer').style.display = 'block';
+            document.getElementById('storeDetailContent').innerHTML = '';
+        
+            document.getElementById('storeID').value = storeData.id;
+            
+            await displayProducts('all');
+        }
+        
+        document.getElementById('backToStoreListBtn').addEventListener('click', function() {
+            document.getElementById('storeDetailContainer').style.display = 'none';
+            document.getElementById('storeContainer').style.display = 'flex';
+        
+            headerLeft.innerHTML = `<h2>${selectedLocation}</h2>`;
+        });
+        
+        // Product Management
+        const addProductBtn = document.getElementById('addProductBtn');
+        const addProductFormContainer = document.getElementById('addProductFormContainer');
+        const closeProductFormBtn = document.getElementById('closeProductFormBtn');
+        const productForm = document.getElementById('productForm');
+        const storeDetailContent = document.getElementById('storeDetailContent');
+        
+        let productList = [];
+        
+        addProductBtn.addEventListener('click', function() {
+            addProductFormContainer.style.display = 'block';
+        });
+        
+        closeProductFormBtn.addEventListener('click', function() {
+            addProductFormContainer.style.display = 'none';
+        });
+        
+        async function fetchProducts(storeId) {
+            const token = checkAuth();
+            try {
+                const response = await fetch(`http://localhost/Baskit/BaskitAPI/public/product/list`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    }
+                });
+
+                const responseText = await response.text();
+                console.log('Raw Products response:', responseText);
+                console.log('Store ID:', storeId); // Debug log
+
+                let products;
+                try {
+                    products = JSON.parse(responseText);
+                    console.log('Parsed products:', products); // Debug log
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Server returned invalid JSON');
+                }
+
+                if (Array.isArray(products)) {
+                    // Filter products for current store
+                    const filteredProducts = products.filter(product => product.store_id == storeId);
+                    console.log('Filtered products for store:', filteredProducts); // Debug log
+                    return filteredProducts;
+                }
+                return [];
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                return [];
+            }
+        }
+        
+        async function displayProducts(category = 'all') {
+            const storeId = document.getElementById('storeID').value;
+            const products = await fetchProducts(storeId);
+            
+            console.log('Display Products - Category:', category);
+            console.log('Display Products - All Products:', products);
+            
+            storeDetailContent.innerHTML = '';
+        
+            let displayedProducts = 0;
+            
+            products.forEach(product => {
+                console.log('Checking product:', product);
+                console.log('Product category:', product.product_category);
+                console.log('Comparing with:', category);
+                
+                if (category.toLowerCase() === 'all' || product.product_category === category) {
+                    displayedProducts++;
+                    const productContainer = document.createElement('div');
+                    productContainer.classList.add('container');
+        
+                    productContainer.innerHTML = `
+                        <h3>${product.product_name}</h3>
+                        <p><strong>Price:</strong> ₱${parseFloat(product.product_price).toFixed(2)}</p>
+                        <p><strong>Category:</strong> ${product.product_category}</p>
+                        <p><strong>Store:</strong> ${product.store_name}</p>
+                    `;
+        
+                    storeDetailContent.appendChild(productContainer);
+                }
+            });
+
+            console.log('Displayed products count:', displayedProducts);
+
+            if (displayedProducts === 0) {
+                storeDetailContent.innerHTML = `<p>No products found in ${category === 'all' ? 'any' : category} category</p>`;
+            }
+        }
+        
+        productForm.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const token = checkAuth();
+
+            const price = parseFloat(document.getElementById('productPrice').value);
+            if (isNaN(price) || price <= 0) {
+                alert('Please enter a valid price greater than 0');
+                return;
+            }
+
+            const productData = {
+                product_name: document.getElementById('productName').value,
+                product_price: price,
+                product_category: document.getElementById('productCategory').value.toUpperCase(),
+                store_id: document.getElementById('storeID').value
+            };
+
+            try {
+                const response = await fetch('http://localhost/Baskit/BaskitAPI/public/product/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`,
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(productData)
+                });
+
+                const responseText = await response.text();
+                console.log('Raw response:', responseText);
+
+                let data;
+                try {
+                    data = JSON.parse(responseText);
+                } catch (e) {
+                    console.error('Failed to parse JSON:', e);
+                    throw new Error('Server returned invalid JSON');
+                }
+
+                if (response.ok) {
+                    alert('Product added successfully!');
+                    addProductFormContainer.style.display = 'none';
+                    productForm.reset();
+                    // Refresh the product list after adding a new product
+                    await displayProducts('all');
+                } else {
+                    alert(data.message || 'Failed to add product');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('An error occurred while adding the product');
+            }
+        });
+        
+    </script>
+    
+    
+    
+    
+    
+</body>
+</html>

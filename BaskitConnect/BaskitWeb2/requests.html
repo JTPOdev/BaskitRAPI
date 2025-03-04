@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Requests</title>
+        <link rel="stylesheet" href="requests.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    </head>
+<body>
+
+    <nav>
+        <div class="nav-header">
+            <div class="logo-container">
+                <img src="img/logo.png" alt="Logo">
+            </div>
+            <h1>Baskit</h1>
+        </div>
+        <ul>
+            <li><a href="dashboard.html"><i class="fa-solid fa-chart-simple"></i> Dashboard</a></li>
+            <li><a href="stores.html"><i class="fas fa-store"></i> Stores</a></li>
+            <li><a href="orders.html"><i class="fas fa-box"></i> Orders</a></li>
+            <li><a href="users.html"><i class="fas fa-users"></i> Users</a></li>
+            <li><a href="requests.html"><i class="fa-solid fa-envelope-open-text"></i>Requests</a></li>
+            <li><a href="admin.html"><i class="fa-solid fa-user-tie"></i> Admin</a></li>
+            <li><a href="logout.html" class="logout"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+    </nav>
+
+    <header>
+        <div class="header-left">
+            <h1><span>Requests</span></h1>
+        </div>
+        <div class="search-notification">
+            <div class="search">
+                <i class="fa-solid fa-magnifying-glass"></i>   
+                <input type="text" id="search" placeholder="Search">
+            </div>
+            <div class="notification">
+                <i class="fa-solid fa-bell"></i>
+            </div>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="container-controls">
+            <select id="filterSelect">
+                <option value="" disabled selected>Select Store Type</option>
+                <option value="Partner">Partnership</option>
+                <option value="Standard">Standard</option>
+            </select>
+        </div>
+
+        <div class="business-profile">
+            <div class="header-row">
+                <div>Username</div>
+                <div>Name</div>
+                <div>Mobile Number</div>
+                <div>Email</div>
+            </div>
+        </div>
+
+        <div class="info-sections"></div>
+
+        <div id="lightbox" class="lightbox">
+            <span class="close-btn">&times;</span>
+            <img id="lightbox-img" src="" alt="Enlarged Image">
+        </div>
+
+    </div>
+
+    <script src="requests.js"></script> 
+    
+</body>
+</html>

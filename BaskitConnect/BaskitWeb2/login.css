@@ -1,0 +1,368 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "poppins";
+}
+
+body{
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 1355px;
+    height: 20vh;
+    padding: 20px;
+    margin-left: 350px;
+    background-color: #E6E6E6;
+}
+
+.header-left {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-left: 80px;
+}
+
+header h1 {
+    font-size: 30px;
+    color: #333;
+    margin: 0;
+}
+
+header h3 {
+    font-size: 20px;
+    color: #00000099;
+    margin: 5px 0 0 0;
+}
+
+.search-notification {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-right: 100px;
+}
+
+.search {
+    display: flex;
+    align-items: center;
+    background-color: #ffffff;
+    padding: 5px 10px;
+    border: 2px solid #ccc;
+    border-radius: 20px;
+    width: 200px;
+    transition: all 0.3s ease;
+}
+
+.search:hover {
+    border-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.search input {
+    border: none;
+    outline: none;
+    width: 100%;
+    padding: 5px;
+    background: transparent;
+    font-size: 16px;
+    color: #333;
+}
+
+.search i {
+    color: #666;
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.search input::placeholder {
+    color: #999;
+}
+
+.notification {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.notification i {
+    color: #000000;
+    font-size: 24px;
+    margin-left: 60px;
+}
+
+nav {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    background-color: #1D7151;
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    padding: 30px;
+    width: 354px;
+    font-weight: 700;
+    overflow-y: auto; 
+    scrollbar-width: thin; 
+    scrollbar-color: #888 #333;  
+}
+
+.nav-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px; 
+}
+
+.logo-container img {
+    width: 140px;
+    height: auto;
+}
+
+nav h1 {
+    color: white;
+    font-size: 40px;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+ul li {
+    margin: 10px 0;
+}
+
+ul li a {
+    color: white;
+    text-decoration: none;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    position: relative;
+    margin-bottom: 15px;
+}
+
+ul li a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: white; 
+    transition: width 0.3s ease;
+}
+
+ul li a:hover::before {
+    width: 100%; 
+}
+
+ul li a.active {
+    background-color: #43866c;
+    border-radius: 12px;
+    transition: background-color 0.6s ease, color 0.6s ease;
+}
+
+
+ul li button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    padding: 5px 10px;
+    position: relative;
+    margin-bottom: 15px;
+    cursor: pointer;
+}
+
+ 
+ul li button:hover::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;  
+    background-color: white;
+    transition: width 0.3s ease;
+}
+
+ 
+ul li button.active {
+    background-color: transparent;
+}
+
+ 
+ul li button::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px; 
+    background-color: white; 
+    transition: width 0.3s ease;
+}
+
+ul li button:hover::after {
+    width: 100%;
+}
+
+.products, .overview, .settings {
+    display: none;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.products li, .overview li, .settings li {
+    padding: 5px;
+}
+
+.products li a, .overview li a, .settings li a {
+    font-size: 16px;
+    margin-left: 30px;
+}
+
+.overview-icon {
+    margin-left: 120px;
+    transition: transform 0.3s ease;
+    font-size: 36px;
+    font-weight: 200;
+}
+
+.products-icon {
+    margin-left: 150px;
+    transition: transform 0.3s ease;
+    font-size: 36px;
+    font-weight: 200;
+}
+
+.settings-icon {
+    margin-left: 150px;
+    transition: transform 0.3s ease;
+    font-size: 36px;
+    font-weight: 200;
+}
+
+.rotate-icon {
+    transform: rotate(90deg);
+    transition: transform 0.3s ease-in-out;
+}
+
+.box{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f4f3ee;
+}
+
+.heading h1{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    font-weight: 800;
+}
+
+.heading h4{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 5px;
+    font-size: 15px;
+    font-weight: 400;
+}
+
+
+.box .inputBox{
+    width: 100%;
+    height: 70px;
+    margin: 40px 0;
+    position: relative;
+}
+
+.inputBox input{
+    font-size: 15px;
+    font-weight: 400;
+}
+
+.inputBox h3{
+    font-size: 20px;
+    font-weight: 800;
+}
+.box input{
+    height: 70%;
+    width: 100%;
+    border-radius: 12px;
+    outline: none;
+    border: none;
+    padding: 20px 45px 20px 20px;
+    font-weight: 400;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.2);
+}
+
+.password-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-container input {
+    height: 100%;
+    padding: 20px;
+}
+
+
+#togglePassword {
+    position: absolute;
+    right: 15px;
+    top: 80%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 400;
+    user-select: none;
+    color: #333;
+}
+.box .loginBtn{
+    display: block;
+    margin: 0 auto;
+    margin-top: 60px;
+    width: 40%;
+    height: 45px;
+    border-radius: 12px;
+    border: none;
+    background-color: #1D7151;
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.box a{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 10px;
+    text-decoration: none;
+    font-size: 15px;
+    color: blue;
+}
+
+.box a:hover {
+    text-decoration: underline;
+}
+
+#loginForm{
+    width: 350px;
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="box">
+        <form id="loginForm">
+
+            <div class="heading">
+                <h1>ADMIN LOGIN</h1>
+                <h4>MANAGE YOUR SHOP AND ORDERS</h4>
+            </div>
+            <div class="inputBox">
+                <h3>EMAIL:</h3>
+                <input type="text" name="username" id="email" placeholder="ENTER YOUR EMAIL ADDRESS" required>
+            </div>
+            <div class="inputBox">
+                <h3>PASSWORD:</h3>
+                <input type="password" name="password" id="password" placeholder="ENTER YOUR PASSWORD" required>
+                <span id="togglePassword">SHOW</span>
+            </div>
+            
+
+            <button type="submit" class="loginBtn">LOG IN</button>
+            <p id="errorMessage" style="color: red; display: none;">Invalid email or password</p>
+            <a href="#">Forgot Password?</a>
+        </form>
+    </div>
+    <script>
+    const BASE_URL = "192.168.100.111";
+    const passwordField = document.getElementById('password');
+    const togglePassword = document.getElementById('togglePassword');
+    const loginForm = document.getElementById('loginForm');
+    const errorMessage = document.getElementById('errorMessage');
+
+    togglePassword.addEventListener('click', () => {
+        const isPasswordVisible = passwordField.type === 'password';
+        passwordField.type = isPasswordVisible ? 'text' : 'password';
+        togglePassword.textContent = isPasswordVisible ? 'HIDE' : 'SHOW';
+    });
+
+    loginForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const username = document.getElementById('email').value;
+        const password = passwordField.value;
+
+        try {
+            const response = await fetch('http://192.168.100.111/Baskit/BaskitAPI/public/admin/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                })
+            });
+
+            const responseText = await response.text();
+            console.log('Raw response:', responseText);
+
+            let data;
+            try {
+                data = JSON.parse(responseText);
+            } catch (e) {
+                console.error('Failed to parse JSON:', e);  
+                throw new Error('Server returned invalid JSON');
+            }
+
+            if (response.ok) {
+                if (data.access_token) {
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('isLoggedIn', 'true');
+                    alert('Login successful!');
+                    window.location.href = 'places.html';
+                } else {
+                    console.error("Login response missing token:", data);
+                    errorMessage.style.display = 'block';
+                    errorMessage.textContent = 'Login failed: Missing access token.';
+                }
+            } else {
+                errorMessage.style.display = 'block';
+                errorMessage.textContent = data.message || 'Invalid credentials';
+            } 
+        } catch (error) {
+            console.error('Error:', error);
+            errorMessage.style.display = 'block';
+            errorMessage.textContent = 'An error occurred. Please try again.';
+        }
+    });
+    </script>
+    
+</body>
+</html>
